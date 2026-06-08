@@ -21,7 +21,7 @@ export default function Layout() {
             headerRight: () => (
               <Pressable onPress={() => router.push("/add")}>
                 <Text
-                  style={{ fontSize: 28, color: "#2ecc71", marginRight: 16 }}
+                  style={{ fontSize: 28, color: "#F4DFC8", marginRight: 16 }}
                 >
                   +
                 </Text>

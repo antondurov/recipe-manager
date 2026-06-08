@@ -2,12 +2,12 @@ import { getAllRecipes, Recipe, saveRecipe } from "@/storage/recipeStorage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -107,7 +107,7 @@ export default function EditRecipeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#FAF6F0" },
   scroll: { padding: 20, gap: 6, paddingBottom: 40 },
   header: { fontSize: 28, fontWeight: "700", marginBottom: 16 },
   label: { fontSize: 14, fontWeight: "600", color: "#333", marginTop: 12 },
