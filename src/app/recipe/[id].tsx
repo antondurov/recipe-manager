@@ -1,14 +1,12 @@
 import { deleteRecipe, getAllRecipes, Recipe } from "@/storage/recipeStorage";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from "expo-router";
+import { useCallback, useLayoutEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RecipeDetailScreen() {
@@ -16,29 +14,47 @@ export default function RecipeDetailScreen() {
   const router = useRouter();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
 
-  useEffect(() => {
-    getAllRecipes().then((all) => {
-      const found = all.find((r) => r.id === id);
-      setRecipe(found ?? null);
-    });
-  }, [id]);
+  const navigation = useNavigation();
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() =>
+            router.push({
+              pathname: "/recipe/edit/[id]",
+              params: { id },
+            } as any)
+          }
+        >
+          <Text
+            style={{
+              color: "#2ecc71",
+              fontSize: 16,
+              fontWeight: "600",
+              marginRight: 16,
+            }}
+          >
+            Edit
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [id, navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getAllRecipes().then((all) => {
+        const found = all.find((r) => r.id === id);
+        setRecipe(found ?? null);
+      });
+    }, [id]),
+  );
   function handleDelete() {
-    Alert.alert(
-      "Delete Recipe",
-      `Are you sure you want to delete "${recipe?.title}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await deleteRecipe(id);
-            router.back();
-          },
-        },
-      ],
-    );
+    const confirmed = window.confirm(`Delete "${recipe?.title}"?`);
+    if (confirmed) {
+      deleteRecipe(id).then(() => router.back());
+    }
   }
 
   if (!recipe) {

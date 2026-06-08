@@ -34,6 +34,10 @@ export default function Layout() {
           options={{ title: "New Recipe", presentation: "modal" }}
         />
         <Stack.Screen name="recipe/[id]" options={{ title: "" }} />
+        <Stack.Screen
+          name="recipe/edit/[id]"
+          options={{ title: "Edit Recipe" }}
+        />
       </Stack>
     </ThemeProvider>
   );
