@@ -1,7 +1,14 @@
 import { deleteRecipe, getAllRecipes, Recipe } from "@/storage/recipeStorage";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -37,6 +44,8 @@ export default function HomeScreen() {
       <FlatList
         data={recipes}
         keyExtractor={(item) => item.id}
+        numColumns={4}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
@@ -48,8 +57,21 @@ export default function HomeScreen() {
               } as any)
             }
           >
+            {item.imageUri ? (
+              <Image
+                source={{ uri: item.imageUri }}
+                style={styles.cardImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.cardImagePlaceholder}>
+                <Text style={styles.cardImagePlaceholderText}>🍽️</Text>
+              </View>
+            )}
             <View style={styles.cardText}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
+              <Text style={styles.cardTitle} numberOfLines={1}>
+                {item.title}
+              </Text>
               {item.description ? (
                 <Text style={styles.cardDesc} numberOfLines={2}>
                   {item.description}
@@ -76,22 +98,43 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     color: "#000000",
   },
-  list: { padding: 16, gap: 12 },
+  list: {
+    padding: 12,
+    paddingBottom: 24,
+  },
+  row: {
+    gap: 12,
+    marginBottom: 12,
+  },
   empty: { flex: 1, alignItems: "center", justifyContent: "center" },
   emptyText: { fontSize: 18, fontWeight: "600", color: "#000000" },
   emptySubtext: { fontSize: 14, color: "#999", marginTop: 6 },
   card: {
     backgroundColor: "#F4EAE0",
     borderRadius: 12,
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    overflow: "hidden",
+    flex: 1,
   },
-  cardText: { flex: 1, color: "#000" },
-  cardTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
-  cardDesc: { fontSize: 13, color: "#666", marginTop: 3 },
-  cardMeta: { fontSize: 12, color: "#999", marginTop: 6 },
+  cardImage: {
+    width: "100%",
+    height: 130,
+  },
+  cardImagePlaceholder: {
+    width: "100%",
+    height: 130,
+    backgroundColor: "#EAD9C8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardImagePlaceholderText: {
+    fontSize: 40,
+  },
+  cardText: {
+    padding: 12,
+  },
+  cardTitle: { fontSize: 15, fontWeight: "600", color: "#000" },
+  cardDesc: { fontSize: 12, color: "#666", marginTop: 3 },
+  cardMeta: { fontSize: 11, color: "#999", marginTop: 6 },
   deleteBtn: { padding: 8 },
   deleteText: { color: "#e74c3c", fontSize: 13, fontWeight: "600" },
 });
