@@ -1,15 +1,40 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  Stack,
+  ThemeProvider,
+  useRouter,
+} from "expo-router";
+import { Pressable, Text, useColorScheme } from "react-native";
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
-
-export default function TabLayout() {
+export default function Layout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            title: "",
+            headerRight: () => (
+              <Pressable onPress={() => router.push("/add")}>
+                <Text
+                  style={{ fontSize: 28, color: "#2ecc71", marginRight: 16 }}
+                >
+                  +
+                </Text>
+              </Pressable>
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="add"
+          options={{ title: "New Recipe", presentation: "modal" }}
+        />
+        <Stack.Screen name="recipe/[id]" options={{ title: "" }} />
+      </Stack>
     </ThemeProvider>
   );
 }
