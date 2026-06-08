@@ -1,98 +1,82 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { useCallback, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+import { getAllRecipes, deleteRecipe, Recipe } from '@/storage/recipeStorage';
 
 export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+  useFocusEffect(
+    useCallback(() => {
+      getAllRecipes().then(setRecipes);
+    }, [])
+  );
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+  async function handleDelete(id: string) {
+    await deleteRecipe(id);
+    setRecipes(prev => prev.filter(r => r.id !== id));
+  }
 
-        {Platform.OS === 'web' && <WebBadge />}
+  if (recipes.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.header}>My Recipes</Text>
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No recipes yet.</Text>
+          <Text style={styles.emptySubtext}>Tap + to add your first one.</Text>
+        </View>
       </SafeAreaView>
-    </ThemedView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>My Recipes</Text>
+      <FlatList
+        data={recipes}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardText}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              {item.description ? (
+                <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
+              ) : null}
+              <Text style={styles.cardMeta}>
+                {item.ingredients.length} ingredients · {item.steps.length} steps
+              </Text>
+            </View>
+            <Pressable onPress={() => handleDelete(item.id)} style={styles.deleteBtn}>
+              <Text style={styles.deleteText}>Delete</Text>
+            </Pressable>
+          </View>
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
+  container: { flex: 1, backgroundColor: '#fff' },
+  header: { fontSize: 28, fontWeight: '700', padding: 20, paddingBottom: 8 },
+  list: { padding: 16, gap: 12 },
+  empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  emptyText: { fontSize: 18, fontWeight: '600', color: '#333' },
+  emptySubtext: { fontSize: 14, color: '#999', marginTop: 6 },
+  card: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    padding: 16,
     flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    gap: 12,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  cardText: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '600', color: '#111' },
+  cardDesc: { fontSize: 13, color: '#666', marginTop: 3 },
+  cardMeta: { fontSize: 12, color: '#999', marginTop: 6 },
+  deleteBtn: { padding: 8 },
+  deleteText: { color: '#e74c3c', fontSize: 13, fontWeight: '600' },
 });
