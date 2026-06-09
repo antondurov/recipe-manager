@@ -18,6 +18,7 @@ export default function EditRecipeScreen() {
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
+  const [icon, setIcon] = useState("")
 
   useEffect(() => {
     getAllRecipes().then((all) => {
@@ -27,6 +28,7 @@ export default function EditRecipeScreen() {
         setDescription(recipe.description);
         setIngredients(recipe.ingredients.join("\n"));
         setSteps(recipe.steps.join("\n"));
+        setIcon(recipe.icon);
       }
     });
   }, [id]);
@@ -56,6 +58,7 @@ export default function EditRecipeScreen() {
       description: description.trim(),
       ingredients: ingredientList,
       steps: stepList,
+      icon: icon,
     };
 
     await saveRecipe(updated);
@@ -72,6 +75,9 @@ export default function EditRecipeScreen() {
 
         <Text style={styles.label}>Title *</Text>
         <TextInput style={styles.input} value={title} onChangeText={setTitle} />
+
+        <Text style={styles.label}>Icon</Text>
+        <TextInput style={styles.input} value={icon} onChangeText={setIcon} />
 
         <Text style={styles.label}>Description</Text>
         <TextInput

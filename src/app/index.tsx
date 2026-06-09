@@ -3,11 +3,10 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   FlatList,
-  Image,
   Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -57,15 +56,13 @@ export default function HomeScreen() {
               } as any)
             }
           >
-            {item.imageUri ? (
-              <Image
-                source={{ uri: item.imageUri }}
-                style={styles.cardImage}
-                resizeMode="cover"
-              />
+            {item.icon ? (
+              <View style={styles.cardImagePlaceholder}>
+                <Text style={styles.cardImagePlaceholderText}>{item.icon}</Text>
+              </View>
             ) : (
               <View style={styles.cardImagePlaceholder}>
-                <Text style={styles.cardImagePlaceholderText}>🍽️</Text>
+                <Text style={styles.cardImagePlaceholderText}>recipe</Text>
               </View>
             )}
             <View style={styles.cardText}>

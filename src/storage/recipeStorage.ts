@@ -6,6 +6,7 @@ export type Recipe = {
   description: string;
   ingredients: string[];
   steps: string[];
+  icon: string;
 };
 
 const STORAGE_KEY = 'recipes';
@@ -32,12 +33,13 @@ export async function deleteRecipe(id: string): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 }
 
-export function createRecipe(title: string, description: string, ingredients: string[], steps: string[]): Recipe {
+export function createRecipe(title: string, description: string, ingredients: string[], steps: string[], icon: string): Recipe {
   return {
     id: Date.now().toString(),
     title,
     description,
     ingredients,
     steps,
+    icon,
   };
 }

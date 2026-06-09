@@ -2,12 +2,12 @@ import { createRecipe, saveRecipe } from "@/storage/recipeStorage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,6 +17,7 @@ export default function AddRecipeScreen() {
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
+  const [icon, setIcon] = useState("");
 
   async function handleSave() {
     if (!title.trim()) {
@@ -39,6 +40,7 @@ export default function AddRecipeScreen() {
       description.trim(),
       ingredientList,
       stepList,
+      icon,
     );
     await saveRecipe(recipe);
     router.back();
@@ -58,6 +60,14 @@ export default function AddRecipeScreen() {
           placeholder="e.g. Grandma's Lasagna"
           value={title}
           onChangeText={setTitle}
+        />
+
+        <Text style={styles.label}>Icon</Text>
+        <TextInput
+        style={styles.input}
+        placeholder="emoji / symbol (optional)"
+        value={icon}
+        onChangeText={setIcon}
         />
 
         <Text style={styles.label}>Description</Text>
