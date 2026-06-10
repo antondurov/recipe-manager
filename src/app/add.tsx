@@ -3,12 +3,14 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
 } from "react-native";
+import { launchImageLibrary } from "react-native-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AddRecipeScreen() {
@@ -17,7 +19,23 @@ export default function AddRecipeScreen() {
   const [description, setDescription] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
-  const [icon, setIcon] = useState("");
+  const placeholderImage = "Tap to add an image";
+  const [image, setImage] = useState("https://placehold.co/100x100/png");
+
+  function handleImageUpload() {
+    launchImageLibrary({ mediaType: "photo" }, (response) => {
+      if (response.didCancel) {
+        console.log("User cancelled image picker");
+      } else if (response.errorMessage) {
+        console.error("ImagePicker Error: ", response.errorMessage);
+      } else {
+        const selectedImage = response.assets && response.assets[0]?.uri;
+        if (selectedImage) {
+          setImage(selectedImage);
+        }
+      }
+    });
+  }
 
   async function handleSave() {
     if (!title.trim()) {
@@ -40,8 +58,9 @@ export default function AddRecipeScreen() {
       description.trim(),
       ingredientList,
       stepList,
-      icon,
+      image as string,
     );
+
     await saveRecipe(recipe);
     router.back();
   }
@@ -62,13 +81,19 @@ export default function AddRecipeScreen() {
           onChangeText={setTitle}
         />
 
-        <Text style={styles.label}>Icon</Text>
-        <TextInput
-        style={styles.input}
-        placeholder="emoji / symbol (optional)"
-        value={icon}
-        onChangeText={setIcon}
-        />
+        <Text style={styles.label}>Image</Text>
+        {image ? (
+          <Pressable onPress={handleImageUpload}>
+            <Image
+              source={typeof image === "string" ? { uri: image } : image}
+              style={styles.imagePreview}
+            />
+          </Pressable>
+        ) : (
+          <Pressable style={styles.imageUploadBtn} onPress={handleImageUpload}>
+            <Text style={styles.imageUploadText}>{placeholderImage}</Text>
+          </Pressable>
+        )}
 
         <Text style={styles.label}>Description</Text>
         <TextInput
@@ -131,4 +156,19 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   saveBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  imageUploadBtn: {
+    backgroundColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  imageUploadText: {
+    color: '#333',
+    fontSize: 16,
+  },
 });

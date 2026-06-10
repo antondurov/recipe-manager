@@ -2,13 +2,19 @@ import { deleteRecipe, getAllRecipes, Recipe } from "@/storage/recipeStorage";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
+  Dimensions,
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const [screenWidth, setScreenWidth] = useState(Dimensions.get("window").width);
+// 5 cards per row with 12px gap and 8px margin on each side
+const cardWidth = screenWidth / 5 - 45;
 
 export default function HomeScreen() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -43,7 +49,7 @@ export default function HomeScreen() {
       <FlatList
         data={recipes}
         keyExtractor={(item) => item.id}
-        numColumns={4}
+        numColumns={5}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
@@ -57,19 +63,17 @@ export default function HomeScreen() {
             }
           >
             {item.icon ? (
-              <View style={styles.cardImagePlaceholder}>
-                <Text style={styles.cardImagePlaceholderText}>{item.icon}</Text>
-              </View>
+              <Image source={{ uri: item.icon }} style={styles.cardImage} />
             ) : (
-              <View style={styles.cardImagePlaceholder}>
-                <Text style={styles.cardImagePlaceholderText}>recipe</Text>
-              </View>
+              <Image source={{ uri: 'https://placehold.co/100x100/png' }} style={styles.cardImage} />
             )}
             <View style={styles.cardText}>
               <Text style={styles.cardTitle} numberOfLines={1}>
                 {item.title}
               </Text>
-              {item.description ? (
+            </View>
+              {/* Commented out description and steps for now */} 
+              {/*{item.description ? (
                 <Text style={styles.cardDesc} numberOfLines={2}>
                   {item.description}
                 </Text>
@@ -77,8 +81,7 @@ export default function HomeScreen() {
               <Text style={styles.cardMeta}>
                 {item.ingredients.length} ingredients · {item.steps.length}{" "}
                 steps
-              </Text>
-            </View>
+              </Text>{*/}
           </Pressable>
         )}
       />
@@ -98,6 +101,7 @@ const styles = StyleSheet.create({
   list: {
     padding: 12,
     paddingBottom: 24,
+    alignItems: "flex-start",
   },
   row: {
     gap: 12,
@@ -107,19 +111,27 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 18, fontWeight: "600", color: "#000000" },
   emptySubtext: { fontSize: 14, color: "#999", marginTop: 6 },
   card: {
-    backgroundColor: "#F4EAE0",
-    borderRadius: 12,
-    overflow: "hidden",
-    flex: 1,
+    width: cardWidth,
+    height: cardWidth,
+    aspectRatio: 1,
+    margin: 8,
+    backgroundColor: '#FAF6F0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingTop : 20,
   },
   cardImage: {
-    width: "100%",
-    height: 130,
+    flex: 1,
+    width: "80%",
+    height: "80%",
   },
   cardImagePlaceholder: {
     width: "100%",
     height: 130,
-    backgroundColor: "#EAD9C8",
+    backgroundColor: "#FAF6F0",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -127,7 +139,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   cardText: {
-    padding: 12,
+    paddingBottom: "6%",
+    paddingTop: "6%",
   },
   cardTitle: { fontSize: 15, fontWeight: "600", color: "#000" },
   cardDesc: { fontSize: 12, color: "#666", marginTop: 3 },
